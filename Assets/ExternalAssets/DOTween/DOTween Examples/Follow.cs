@@ -8,6 +8,7 @@ public class Follow : MonoBehaviour
 	Vector3 targetLastPos;
 	Tweener tween;
 
+
 	void Start()
 	{
 		// First create the "move to target" tween and store it as a Tweener.
