@@ -1,18 +1,25 @@
 ﻿using System;
 using UnityEngine;
 using DG.Tweening;
+using DG.Tweening.Core;
+using System.Threading;
+using UnityEngine.SocialPlatforms;
 
 
-namespace DOTweenBased
+namespace UsefulScripts.DOTweenBased
 {
+    // Нельзя переиспользовать если при первом запуске указать 0 секунд
+    // Разобраться почему !!!
     public class DOTweenTimer : MonoBehaviour
     {
         [SerializeField] private int _secondsNumber;
         [SerializeField] private int _warningMoment;
         [SerializeField] private bool _launchOnStart = false;
         private Tweener timer;
+        private TweenerCore<int, int, DG.Tweening.Plugins.Options.NoOptions> timerCore;
+        private TweenCallback<int> timerCallback;
 
-
+        
         private void Start()
         {
             if(_launchOnStart == true)
@@ -38,7 +45,7 @@ namespace DOTweenBased
                 bool wasWarning = false;
                 int previousSeconds = -1;
 
-                timer = DOVirtual.Int(seconds, 0, seconds, (seconds) =>
+                timerCallback = (seconds) =>
                 {
                     if (wasWarning == false && warningTime > 0f && seconds - warningTime <= 0f)
                     {
@@ -59,12 +66,25 @@ namespace DOTweenBased
 
                         previousSeconds = seconds;
                     }
-                }).SetAutoKill(false).SetEase(Ease.Linear);
+                };
+
+                timer = DOVirtual.Int(seconds, 0, seconds, timerCallback)
+                    .SetAutoKill(false)
+                    .SetEase(Ease.Linear);
+
+                timerCore = (TweenerCore<int, int, DG.Tweening.Plugins.Options.NoOptions>)timer;
             }
             else
             {
+                Debug.Log($"timer.IsActive(): {timer.IsActive()}!!!");
+                
                 timer.ChangeValues(seconds, 0, seconds);
+                timerCore.OnUpdate(delegate { timerCallback(seconds); });
                 timer.Restart();
+                
+                Debug.Log($"timer.IsPlaying(): {timer.IsPlaying()}!!!");
+                Debug.Log($"timerCore.startValue: {timerCore.startValue}!!!");
+                Debug.Log($"timerCore.endValue: {timerCore.endValue}!!!");
             }
         }
     }

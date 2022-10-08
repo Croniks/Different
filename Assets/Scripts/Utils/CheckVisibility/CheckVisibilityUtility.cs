@@ -28,29 +28,24 @@ namespace Utils.CheckVisibility
         {
             Vector3 size = boxCollider.size;
             Vector3 center = boxCollider.center;
-            Transform objectTrans = boxCollider.transform;
-
-            var worldMatrix = objectTrans.localToWorldMatrix;
-            var currentRotation = objectTrans.rotation;
-            objectTrans.rotation = Quaternion.identity;
-
+            
             float xOffset = size.x / 2;
             float yOffset = size.y / 2;
             float zOffset = size.z / 2;
-
+            
+            var worldObjectMatrix = boxCollider.transform.localToWorldMatrix;
+            
             Vector3[] vertices = new Vector3[] {
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y + yOffset, center.z + zOffset)), // 0
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y - yOffset, center.z + zOffset)), // 1
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y - yOffset, center.z + zOffset)), // 2
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y + yOffset, center.z + zOffset)), // 3
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y + yOffset, center.z - zOffset)), // 4
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y - yOffset, center.z - zOffset)), // 5
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y - yOffset, center.z - zOffset)), // 6
-            worldMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y + yOffset, center.z - zOffset)), // 7
-        };
-
-            objectTrans.rotation = currentRotation;
-
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y + yOffset, center.z + zOffset)), // 0
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y - yOffset, center.z + zOffset)), // 1
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y - yOffset, center.z + zOffset)), // 2
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y + yOffset, center.z + zOffset)), // 3
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y + yOffset, center.z - zOffset)), // 4
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x + xOffset, center.y - yOffset, center.z - zOffset)), // 5
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y - yOffset, center.z - zOffset)), // 6
+                worldObjectMatrix.MultiplyPoint3x4(new Vector3(center.x - xOffset, center.y + yOffset, center.z - zOffset)), // 7
+            };
+            
             //DebugVertices(vertices);
 
             return CheckVerticesVisibility(vertices, camera, visibilityOption);
