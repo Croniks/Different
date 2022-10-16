@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-
+using UnityEngine.UIElements;
 
 public class Game : MonoBehaviour
 {
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
     [SerializeField] private Platform _startPlatform;
-    [SerializeField] private Transform _initialPointTransform;
     [SerializeField] private LevelDifficulty _currentLevelDifficulty;
 
     [SerializeField] private BoxCollider _gameBoundsCollider;
@@ -19,16 +18,23 @@ public class Game : MonoBehaviour
     [SerializeField] private PlatformsKicker _platformsKicker;
 
     private PlatformsSetter _platformsSetter;
+    private Transform[] _firstNextPlatformPositions;
 
 
     private void Awake()
     {
         var levelInfo = _levelsInfo.FirstOrDefault(li => li.levelDifficulty == _currentLevelDifficulty);
-        var platformsInfo = new PlatformsInfo(_maxPltaformsCount, _startPlatform, _initialPointTransform.position, levelInfo.platformPrefab);
+        var platformsInfo = new PlatformsInfo(_maxPltaformsCount, levelInfo.platformPrefab);
         var boundsInfo = new BoundsInfo(_gameBoundsCollider, _boundsLength, _boundsHight);
-        
-        _platformsSetter = new PlatformsSetter(boundsInfo, platformsInfo);
 
+        _firstNextPlatformPositions = new Transform[2];
+
+
+        _platformsSetter = new PlatformsSetter(boundsInfo, platformsInfo);
+    }
+
+    private void Start()
+    {
         //_platformsSetter.CreatePlatforms();
         //_platformsSetter.SetPlatforms();
     }

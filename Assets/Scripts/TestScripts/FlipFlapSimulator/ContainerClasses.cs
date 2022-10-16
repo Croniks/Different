@@ -27,15 +27,11 @@ public class BoundsInfo
 public class PlatformsInfo
 {
     public int maxPlatformsCount;
-    public Platform startPlatform;
-    public Vector3 startPlatformPosition;
     public Platform platformPrefab;
 
-    public PlatformsInfo(int maxPlatformsCount, Platform startPlatform, Vector3 initialPoint, Platform platformPrefab)
+    public PlatformsInfo(int maxPlatformsCount, Platform platformPrefab)
     {
         this.maxPlatformsCount = maxPlatformsCount;
-        this.startPlatform = startPlatform;
-        this.startPlatformPosition = initialPoint;
         this.platformPrefab = platformPrefab;
     }
 }

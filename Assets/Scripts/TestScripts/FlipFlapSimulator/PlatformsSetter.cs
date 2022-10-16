@@ -14,11 +14,9 @@ public class PlatformsSetter
     private Bounds _gameBounds;
 
     private int _maxPltaformsCount;
-    private Vector3 _initialPoint;
     private Platform _platformPrefab;
 
     private LinkedList<Platform> _platformsList;
-    private Platform _startPlatform;
     
     public PlatformsSetter(BoundsInfo boundsInfo, PlatformsInfo platformsInfo)
     {
@@ -27,17 +25,13 @@ public class PlatformsSetter
         _boundsHight = boundsInfo.boundsHight;
 
         _maxPltaformsCount = platformsInfo.maxPlatformsCount;
-        _startPlatform = platformsInfo.startPlatform;
-        _initialPoint = platformsInfo.startPlatformPosition;
         _platformPrefab = platformsInfo.platformPrefab;
 
         CalculateGameBounds();
     }
 
-    public void CreatePlatforms(PlatformsMover platformsMover, PlatformsKicker platformsKicker)
+    public void CreatePlatforms(Transform platformsParent)
     {
-        var platformsParent = platformsMover.transform;
-
         _platformsList = new LinkedList<Platform>();
 
         for (int i = 0; i < _maxPltaformsCount; i++)
@@ -52,15 +46,13 @@ public class PlatformsSetter
         }
     }
 
-    public void SetPlatforms()
+    public void SetPlatforms(IReadOnlyCollection<Transform> firstNextPlatformPositions)
     {
-        _startPlatform.transform.position = _initialPoint;
-
         for (LinkedListNode<Platform> node = _platformsList.First; node != null; node = node.Next)
         {
-            if(node == _platformsList.First)
+            if (node == _platformsList.First)
             {
-                SetPlatformPosition(node.Value, _startPlatform.NextPlatformPositions);
+                SetPlatformPosition(node.Value, firstNextPlatformPositions);
             }
             else
             {
@@ -73,14 +65,14 @@ public class PlatformsSetter
     {
         if(platform.Previous != null)
         {
-            platform.Previous = platform.Next;
+            platform.Previous.Next = platform.Next;
         }
 
         if(platform.Next != null)
         {
-            platform.Next = platform.Previous;
+            platform.Next.Previous = platform.Previous;
         }
-
+        
         platform.Next = null;
         platform.Previous = _platformsList.Last<Platform>();
 

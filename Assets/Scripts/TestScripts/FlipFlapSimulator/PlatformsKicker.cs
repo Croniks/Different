@@ -8,27 +8,27 @@ public class PlatformsKicker : MonoBehaviour
 {
     public event Action<Platform> PlatformKicked;
 
-    public Dictionary<Collider, Platform> platformsAndColliders = new Dictionary<Collider, Platform>();
+    public Dictionary<Collider, IKickable> platformsAndColliders = new Dictionary<Collider, IKickable>();
 
     
-    public void RegisterByCollider(Collider collider, Platform platform)
+    public void RegisterByCollider(Collider collider, IKickable kickable)
     {
         if(platformsAndColliders.ContainsKey(collider) == false)
         {
-            platformsAndColliders.Add(collider, platform);  
+            platformsAndColliders.Add(collider, kickable);  
         }
     }
     
     private void OnTriggerEnter(Collider other)
     {
-        if(platformsAndColliders.TryGetValue(other, out Platform platform))
+        if(platformsAndColliders.TryGetValue(other, out IKickable kickable))
         {
-            if(platform.IsStartPlatform != true)
+            if(kickable is Platform plaform)
             {
-                platform.SetAfterKickAction(OnPlatformKicked);
+                plaform.OnPlatformKicked(OnPlatformKicked);
             }
 
-            platform.Kick();
+            kickable.Kick();
         }
     }
     
