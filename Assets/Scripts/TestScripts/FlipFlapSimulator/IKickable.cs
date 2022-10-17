@@ -1,4 +1,6 @@
+using System;
+
 public interface IKickable
 { 
-    public void Kick();
+    public void Kick(Action<IKickable> afterKick);
 }

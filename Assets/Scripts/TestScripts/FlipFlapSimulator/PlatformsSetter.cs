@@ -1,22 +1,21 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using UnityEngine;
 
 
 public class PlatformsSetter
 {
-    public event Action<Platform> PlatformCreated;
+    public event Action<ReusablePlatform> PlatformCreated;
 
     private BoxCollider _gameBoundsCollider;
     private float _boundsLength, _boundsHight;
     private Bounds _gameBounds;
 
     private int _maxPltaformsCount;
-    private Platform _platformPrefab;
+    private ReusablePlatform _platformPrefab;
 
-    private LinkedList<Platform> _platformsList;
+    private AbstractPlatform _firstPlatform = null;
+    private AbstractPlatform _lastPlatform = null;
+    
     
     public PlatformsSetter(BoundsInfo boundsInfo, PlatformsInfo platformsInfo)
     {
@@ -32,67 +31,44 @@ public class PlatformsSetter
 
     public void CreatePlatforms(Transform platformsParent)
     {
-        _platformsList = new LinkedList<Platform>();
-
         for (int i = 0; i < _maxPltaformsCount; i++)
         {
             var platform = GameObject.Instantiate(_platformPrefab, platformsParent);
-            var platformNode = _platformsList.AddLast(platform);
-
-            platform.Previous = platformNode.Previous.Value;
-            platform.Next = platformNode.Next.Value;
-
+            
+            if(_firstPlatform == null)
+            {
+                _firstPlatform = _lastPlatform = platform;
+            }
+            else
+            {
+                _lastPlatform.Next = platform;
+                platform.Previous = _lastPlatform;
+            }
+            
             PlatformCreated?.Invoke(platform);
         }
     }
 
-    public void SetPlatforms(IReadOnlyCollection<Transform> firstNextPlatformPositions)
+    public void PlacePlatforms(StartPlatform startPlatform)
     {
-        for (LinkedListNode<Platform> node = _platformsList.First; node != null; node = node.Next)
+        for (var platform = _firstPlatform; platform != null; platform = platform.Next)
         {
-            if (node == _platformsList.First)
+            if(platform == _firstPlatform)
             {
-                SetPlatformPosition(node.Value, firstNextPlatformPositions);
+                
             }
             else
             {
-                SetPlatformPosition(node.Value, node.Previous.Value.NextPlatformPositions);
+                
             }
         }
     }
     
-    public void SetPlatformAfterKicking(Platform platform)
+    public void ChangePlatformLocation(AbstractPlatform changeablePlatform)
     {
-        if(platform.Previous != null)
-        {
-            platform.Previous.Next = platform.Next;
-        }
-
-        if(platform.Next != null)
-        {
-            platform.Next.Previous = platform.Previous;
-        }
-        
-        platform.Next = null;
-        platform.Previous = _platformsList.Last<Platform>();
-
-        SetPlatformPosition(platform, platform.Previous.NextPlatformPositions);
+        changeablePlatform.ChangeLocation(_lastPlatform, _gameBounds);
     }
-
-    private void SetPlatformPosition(Platform platform, IReadOnlyCollection<Transform> nextPlatformPositions)
-    {
-        int index = UnityEngine.Random.Range(0, 2);
-        Vector3 newPosition = nextPlatformPositions.ElementAt(index).position;
-        platform.transform.position = newPosition;
-
-        if (_gameBounds.Contains(platform.BoundaryPoints.ElementAt(0).position) == false
-            || _gameBounds.Contains(platform.BoundaryPoints.ElementAt(1).position) == false)
-        {
-            index = index == 0 ? 1 : 0;
-            platform.transform.position = nextPlatformPositions.ElementAt(index).position;
-        }
-    }
-    
+     
     private void CalculateGameBounds()
     {
         _gameBoundsCollider.center = Vector3.zero;

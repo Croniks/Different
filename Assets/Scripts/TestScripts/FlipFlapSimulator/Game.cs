@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class Game : MonoBehaviour
 {
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
-    [SerializeField] private Platform _startPlatform;
+    [SerializeField] private ReusablePlatform _startPlatform;
     [SerializeField] private LevelDifficulty _currentLevelDifficulty;
 
     [SerializeField] private BoxCollider _gameBoundsCollider;
@@ -61,13 +61,19 @@ public class Game : MonoBehaviour
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
     }
 
-    private void OnPlatformCreated(Platform platform)
+    private void OnPlatformCreated(ReusablePlatform platform)
     {
-        _platformsKicker.RegisterByCollider(platform.GetComponent<Collider>(), platform);
+        if(platform is IKickable kickable)
+        {
+            _platformsKicker.RegisterByCollider(platform.GetComponent<Collider>(), kickable);
+        }
     }
 
-    private void OnPlatformKicked(Platform platform)
+    private void OnPlatformKicked(IKickable kickable)
     {
-        _platformsSetter.SetPlatformAfterKicking(platform);
+        if(kickable is AbstractPlatform changeablePlatform)
+        {
+            _platformsSetter.ChangePlatformLocation(changeablePlatform);
+        }
     }
 }

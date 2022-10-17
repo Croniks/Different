@@ -7,7 +7,7 @@ public enum LevelDifficulty { Easy = 0, Medium = 1, Hard = 2 };
 public class LevelInfo
 {
     public LevelDifficulty levelDifficulty;
-    public Platform platformPrefab;
+    public ReusablePlatform platformPrefab;
 }
 
 public class BoundsInfo
@@ -27,9 +27,9 @@ public class BoundsInfo
 public class PlatformsInfo
 {
     public int maxPlatformsCount;
-    public Platform platformPrefab;
+    public ReusablePlatform platformPrefab;
 
-    public PlatformsInfo(int maxPlatformsCount, Platform platformPrefab)
+    public PlatformsInfo(int maxPlatformsCount, ReusablePlatform platformPrefab)
     {
         this.maxPlatformsCount = maxPlatformsCount;
         this.platformPrefab = platformPrefab;
