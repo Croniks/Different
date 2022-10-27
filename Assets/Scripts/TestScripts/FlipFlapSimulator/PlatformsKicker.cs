@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class PlatformsKicker : MonoBehaviour
 {
-    public event Action<IKickable> PlatformKicked;
+    public event Action<AbstractPlatform> PlatformKicked;
 
-    public Dictionary<Collider, IKickable> kickablesDict = new Dictionary<Collider, IKickable>();
+    public Dictionary<Collider, AbstractPlatform> kickablesDict = new Dictionary<Collider, AbstractPlatform>();
 
     
-    public void RegisterByCollider(Collider collider, IKickable kickable)
+    public void RegisterByCollider(Collider collider, AbstractPlatform kickable)
     {
         if(kickablesDict.ContainsKey(collider) == false)
         {
@@ -21,14 +21,14 @@ public class PlatformsKicker : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if(kickablesDict.TryGetValue(other, out IKickable kickable))
+        if(kickablesDict.TryGetValue(other, out AbstractPlatform platform))
         {
-            kickable.Kick(OnPlatformKicked);
+            platform.Kick(AfterKickAction);
         }
     }
-    
-    private void OnPlatformKicked(IKickable kickable)
+
+    private void AfterKickAction(AbstractPlatform platform)
     {
-        PlatformKicked?.Invoke(kickable);
+        PlatformKicked?.Invoke(platform);
     }
 }

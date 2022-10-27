@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-public class PlatformsSetter
+public class PlatformsPlacer
 {
     public event Action<ReusablePlatform> PlatformCreated;
 
@@ -17,7 +17,7 @@ public class PlatformsSetter
     private AbstractPlatform _lastPlatform = null;
     
     
-    public PlatformsSetter(BoundsInfo boundsInfo, PlatformsInfo platformsInfo)
+    public PlatformsPlacer(BoundsInfo boundsInfo, PlatformsInfo platformsInfo)
     {
         _gameBoundsCollider = boundsInfo.boundsCollider;
         _boundsLength = boundsInfo.boundsLength;
@@ -41,8 +41,8 @@ public class PlatformsSetter
             }
             else
             {
-                _lastPlatform.Next = platform;
-                platform.Previous = _lastPlatform;
+                //_lastPlatform.Next = platform;
+                //platform.Previous = _lastPlatform;
             }
             
             PlatformCreated?.Invoke(platform);
@@ -51,24 +51,55 @@ public class PlatformsSetter
 
     public void PlacePlatforms(StartPlatform startPlatform)
     {
-        for (var platform = _firstPlatform; platform != null; platform = platform.Next)
-        {
-            if(platform == _firstPlatform)
-            {
+        //for (var platform = _firstPlatform; platform != null; platform = platform.Next)
+        //{
+        //    if(platform == _firstPlatform)
+        //    {
                 
-            }
-            else
-            {
+        //    }
+        //    else
+        //    {
                 
-            }
-        }
+        //    }
+        //}
     }
     
-    public void ChangePlatformLocation(AbstractPlatform changeablePlatform)
+    public void ReplacePlatform(ReusablePlatform changeablePlatform)
     {
-        changeablePlatform.ChangeLocation(_lastPlatform, _gameBounds);
+        //changeablePlatform.ChangeLocation(_lastPlatform, _gameBounds);
     }
-     
+
+    //public void MovePlatformToEndOfList(ReusablePlatform lastPlatform)
+    //{
+    //    if (Previous != null)
+    //    {
+    //        Previous.Next = Next;
+    //    }
+
+    //    if (Next != null)
+    //    {
+    //        Next.Previous = Previous;
+    //    }
+
+    //    Next = null;
+    //    Previous = lastPlatform;
+    //    lastPlatform.Next = this;
+    //}
+
+    //public void PlaceLastPlatform(IReadOnlyCollection<Transform> newPositions, Bounds gameBounds)
+    //{
+    //    int index = Random.Range(0, 2);
+    //    Vector3 newPosition = newPositions.ElementAt(index).position;
+    //    transform.localPosition = newPosition;
+
+    //    //if (gameBounds.Contains(BoundaryPoints.ElementAt(0).position) == false
+    //    //    || gameBounds.Contains(BoundaryPoints.ElementAt(1).position) == false)
+    //    //{
+    //    //    index = index == 0 ? 1 : 0;
+    //    //    transform.localPosition = newPositions.ElementAt(index).position;
+    //    //}
+    //}
+
     private void CalculateGameBounds()
     {
         _gameBoundsCollider.center = Vector3.zero;

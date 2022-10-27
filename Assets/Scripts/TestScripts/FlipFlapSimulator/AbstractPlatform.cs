@@ -1,22 +1,72 @@
 using System;
-using System.Collections.Generic;
+
+using DG.Tweening;
+
 using UnityEngine;
+
+
+[Serializable]
+public struct PointsInfo
+{
+    public Vector3 firsPoint;
+    public Vector3 secondPoint;
+}
 
 public abstract class AbstractPlatform : MonoBehaviour
 {
-    public IReadOnlyCollection<Transform> BoundaryPoints { get => _boundaryPoints; }
-    [SerializeField] private Transform[] _boundaryPoints;
+    [SerializeField] private float _kickingDuration = 1.5f;
+    [SerializeField] private float _kickingYEndPostion = -5f;
 
-    public IReadOnlyCollection<Transform> NextPlatformPositions { get => _nextPlatformPositions; }
-    [SerializeField] private Transform[] _nextPlatformPositions;
+    [SerializeField] private PointsInfo _nextPlatformPositions;
+    public PointsInfo NextPlatformPositions => ConvertPoints(_nextPlatformPositions);
 
-
-    public void Kick(Action<AbstractPlatform> afterKickAction, float time)
+    
+    public virtual void Kick(Action<AbstractPlatform> afterKickAction)
     {
-        Kick(time);
+        transform
+            .DOMoveY(_kickingYEndPostion, _kickingDuration)
+            .SetEase(Ease.Linear)
+            .OnComplete(() => { afterKickAction?.Invoke(this); })
+            .Play();
+    }
+    
+    protected PointsInfo ConvertPoints(PointsInfo points)
+    {
+        var matrix = transform.localToWorldMatrix;
 
-        afterKickAction?.Invoke(this);
+        points.firsPoint = matrix.MultiplyPoint3x4(points.firsPoint);
+        points.secondPoint = matrix.MultiplyPoint3x4(points.secondPoint);
+
+        return points;
     }
 
-    protected abstract void Kick(float time);
+    public virtual void OnDrawGizmos()
+    {
+        var rad = transform.localScale.x / 10;
+
+        var nextPoints = ConvertPoints(_nextPlatformPositions);
+
+        Gizmos.color = Color.cyan;
+
+        Gizmos.DrawSphere(nextPoints.firsPoint, rad);
+        Gizmos.DrawSphere(nextPoints.secondPoint, rad);
+    }
+
+    //#if UNITY_EDITOR 
+
+    //protected void OnMouseOver()
+    //{
+    //    if (Input.GetMouseButtonDown(0))
+    //    {
+    //        Vector3 initialPosition = transform.position;
+    //        Kick((platform) => 
+    //        {
+    //            Debug.Log($"{platform.name} was kicked !!!");
+
+    //            transform.position = initialPosition;
+    //        });
+    //    }
+    //}
+
+    //#endif
 }

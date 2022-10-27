@@ -17,7 +17,7 @@ public class Game : MonoBehaviour
 
     [SerializeField] private PlatformsKicker _platformsKicker;
 
-    private PlatformsSetter _platformsSetter;
+    private PlatformsPlacer _platformsPlacer;
     private Transform[] _firstNextPlatformPositions;
 
 
@@ -30,7 +30,7 @@ public class Game : MonoBehaviour
         _firstNextPlatformPositions = new Transform[2];
 
 
-        _platformsSetter = new PlatformsSetter(boundsInfo, platformsInfo);
+        _platformsPlacer = new PlatformsPlacer(boundsInfo, platformsInfo);
     }
 
     private void Start()
@@ -51,29 +51,26 @@ public class Game : MonoBehaviour
 
     private void AddHandlers()
     {
-        _platformsSetter.PlatformCreated += OnPlatformCreated;
+        _platformsPlacer.PlatformCreated += OnPlatformCreated;
         _platformsKicker.PlatformKicked += OnPlatformKicked;
     }
 
     private void RemoveHandlers()
     {
-        _platformsSetter.PlatformCreated -= OnPlatformCreated;
+        _platformsPlacer.PlatformCreated -= OnPlatformCreated;
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
     }
 
     private void OnPlatformCreated(ReusablePlatform platform)
     {
-        if(platform is IKickable kickable)
-        {
-            _platformsKicker.RegisterByCollider(platform.GetComponent<Collider>(), kickable);
-        }
+        _platformsKicker.RegisterByCollider(platform.GetComponent<Collider>(), platform);
     }
 
-    private void OnPlatformKicked(IKickable kickable)
+    private void OnPlatformKicked(AbstractPlatform platform)
     {
-        if(kickable is AbstractPlatform changeablePlatform)
+        if (platform is ReusablePlatform reusablePlatform)
         {
-            _platformsSetter.ChangePlatformLocation(changeablePlatform);
+            _platformsPlacer.ReplacePlatform(reusablePlatform);
         }
     }
 }
