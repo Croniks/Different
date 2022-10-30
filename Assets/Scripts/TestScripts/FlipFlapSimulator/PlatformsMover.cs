@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class PlatformsMover : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
+    [SerializeField] private float _speed;
+    [SerializeField] private Vector3 _moveDirecton;
+
+    private Transform _selfTransform;
+
         
+    private void Awake()
+    {
+        _selfTransform = GetComponent<Transform>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Move()
     {
-        
+        _selfTransform.Translate(_moveDirecton * _speed * Time.deltaTime, Space.Self);
     }
 }

@@ -1,42 +1,61 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-using UnityEngine.UIElements;
+
 
 public class Game : MonoBehaviour
 {
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
-    [SerializeField] private ReusablePlatform _startPlatform;
+    [SerializeField] private AbstractPlatform _startPlatform;
     [SerializeField] private LevelDifficulty _currentLevelDifficulty;
 
-    [SerializeField] private BoxCollider _gameBoundsCollider;
     [SerializeField] private float _boundsLength = 50f, _boundsHight = 2f;
     [SerializeField] private int _maxPltaformsCount = 40;
 
-    [SerializeField] private PlatformsKicker _platformsKicker;
+    [SerializeField, Space] private Transform _leftBound;
+    [SerializeField] private Transform _rightBound;
+    [SerializeField] private LayerMask _borderCheckLayer;
 
+    [SerializeField, Space] private PlatformsKicker _platformsKicker;
+    [SerializeField] private PlatformsMover _platformsMover;
     private PlatformsPlacer _platformsPlacer;
-    private Transform[] _firstNextPlatformPositions;
 
+    [SerializeField, Space] private SphereController _sphereController;
+
+    
+    #region UnityCalls
 
     private void Awake()
     {
         var levelInfo = _levelsInfo.FirstOrDefault(li => li.levelDifficulty == _currentLevelDifficulty);
         var platformsInfo = new PlatformsInfo(_maxPltaformsCount, levelInfo.platformPrefab);
-        var boundsInfo = new BoundsInfo(_gameBoundsCollider, _boundsLength, _boundsHight);
+        
+        _platformsPlacer = new PlatformsPlacer(platformsInfo, _borderCheckLayer);
+    }
+    
+    private IEnumerator Start()
+    {
+        CreateGameBounds(Camera.main);
 
-        _firstNextPlatformPositions = new Transform[2];
+        // Пропускаем один кадр, что бы посчитались границы уровня
+        yield return null;
 
-
-        _platformsPlacer = new PlatformsPlacer(boundsInfo, platformsInfo);
+        _platformsKicker.RegisterPlatformByCollider(_startPlatform.GetComponent<Collider>(), _startPlatform);
+        _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
     }
 
-    private void Start()
+    private void Update()
     {
-        //_platformsSetter.CreatePlatforms();
-        //_platformsSetter.SetPlatforms();
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
+        }
+
+        _platformsMover.Move();
+        _sphereController.Move();
     }
 
     private void OnEnable()
@@ -48,6 +67,10 @@ public class Game : MonoBehaviour
     {
         RemoveHandlers();
     }
+
+    #endregion
+    
+    #region PrivateMethods
 
     private void AddHandlers()
     {
@@ -61,9 +84,37 @@ public class Game : MonoBehaviour
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
     }
 
+    private void CreateGameBounds(Camera mainCamera)
+    {
+        float zDistance = Vector3.Distance(mainCamera.transform.position, _startPlatform.transform.position);
+        Vector3 leftBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, zDistance));
+        Vector3 rightBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, zDistance));
+
+        Vector3 localScale = new Vector3(1, _boundsHight, _boundsLength);
+        Vector3 xPositionOffest = new Vector3(localScale.x / 1.5f, 0f, 0f);
+
+        leftBoundPosition = leftBoundPosition - xPositionOffest;
+        rightBoundPosition = rightBoundPosition + xPositionOffest;
+
+        _leftBound.position = leftBoundPosition;
+        _rightBound.position = rightBoundPosition;
+
+        _leftBound.localScale = localScale;
+        _rightBound.localScale = localScale;
+
+        Vector3 eulerAngles = new Vector3(0f, mainCamera.transform.eulerAngles.y, mainCamera.transform.eulerAngles.z);
+
+        _leftBound.eulerAngles = eulerAngles;
+        _rightBound.eulerAngles = eulerAngles;
+    }
+
+    #endregion
+
+    #region EventHandlers
+
     private void OnPlatformCreated(ReusablePlatform platform)
     {
-        _platformsKicker.RegisterByCollider(platform.GetComponent<Collider>(), platform);
+        _platformsKicker.RegisterPlatformByCollider(platform.GetComponent<Collider>(), platform);
     }
 
     private void OnPlatformKicked(AbstractPlatform platform)
@@ -73,4 +124,6 @@ public class Game : MonoBehaviour
             _platformsPlacer.ReplacePlatform(reusablePlatform);
         }
     }
+
+    #endregion
 }

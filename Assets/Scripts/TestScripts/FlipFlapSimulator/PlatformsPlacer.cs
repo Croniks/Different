@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 
@@ -6,127 +8,96 @@ public class PlatformsPlacer
 {
     public event Action<ReusablePlatform> PlatformCreated;
 
-    private BoxCollider _gameBoundsCollider;
-    private float _boundsLength, _boundsHight;
-    private Bounds _gameBounds;
-
     private int _maxPltaformsCount;
     private ReusablePlatform _platformPrefab;
+    private Vector3 _zOffset;
+    private Vector3 _xOffset;
 
-    private AbstractPlatform _firstPlatform = null;
-    private AbstractPlatform _lastPlatform = null;
+    private LayerMask _physicsBoxMask;
+    private Vector3 _physicsBoxSize;
+    private Quaternion _physicsBoxRotation;
+
+    private List<ReusablePlatform> _platforms;
+    private ReusablePlatform _lastPlatform = null;
+
     
-    
-    public PlatformsPlacer(BoundsInfo boundsInfo, PlatformsInfo platformsInfo)
+    public PlatformsPlacer(PlatformsInfo platformsInfo, LayerMask borderCheckLayer)
     {
-        _gameBoundsCollider = boundsInfo.boundsCollider;
-        _boundsLength = boundsInfo.boundsLength;
-        _boundsHight = boundsInfo.boundsHight;
-
         _maxPltaformsCount = platformsInfo.maxPlatformsCount;
         _platformPrefab = platformsInfo.platformPrefab;
 
-        CalculateGameBounds();
+        _physicsBoxMask = borderCheckLayer;
+        _physicsBoxSize = (_platformPrefab.transform.localScale / 2) /*+ (Vector3.one * 0.1f)*/;
+        _physicsBoxRotation = _platformPrefab.transform.rotation;
+
+        _zOffset = new Vector3(0, 0, _platformPrefab.transform.localScale.z / 2);
+        _xOffset = new Vector3(-(_platformPrefab.transform.localScale.x / 2), 0, 0);
     }
 
-    public void CreatePlatforms(Transform platformsParent)
+    public void PlacePlatforms(Transform platformsParent, AbstractPlatform startPlatform)
     {
-        for (int i = 0; i < _maxPltaformsCount; i++)
+        if(_platforms == null || _platforms.Count < 1)
         {
-            var platform = GameObject.Instantiate(_platformPrefab, platformsParent);
-            
-            if(_firstPlatform == null)
+            _platforms = new List<ReusablePlatform>(_maxPltaformsCount);
+
+            for (int i = 0; i < _maxPltaformsCount; i++)
             {
-                _firstPlatform = _lastPlatform = platform;
+                var platform = GameObject.Instantiate(_platformPrefab, platformsParent);
+                platform.name = (i + 1).ToString();
+                _platforms.Add(platform);
+
+                PlatformCreated?.Invoke(platform);
             }
-            else
-            {
-                //_lastPlatform.Next = platform;
-                //platform.Previous = _lastPlatform;
-            }
-            
-            PlatformCreated?.Invoke(platform);
         }
-    }
 
-    public void PlacePlatforms(StartPlatform startPlatform)
-    {
-        //for (var platform = _firstPlatform; platform != null; platform = platform.Next)
-        //{
-        //    if(platform == _firstPlatform)
-        //    {
-                
-        //    }
-        //    else
-        //    {
-                
-        //    }
-        //}
-    }
-    
-    public void ReplacePlatform(ReusablePlatform changeablePlatform)
-    {
-        //changeablePlatform.ChangeLocation(_lastPlatform, _gameBounds);
-    }
+        startPlatform.transform.parent = platformsParent.transform;
+        startPlatform.transform.localPosition = Vector3.zero;
 
-    //public void MovePlatformToEndOfList(ReusablePlatform lastPlatform)
-    //{
-    //    if (Previous != null)
-    //    {
-    //        Previous.Next = Next;
-    //    }
+        var possiblePositions = startPlatform.NextPlatformPositions;
 
-    //    if (Next != null)
-    //    {
-    //        Next.Previous = Previous;
-    //    }
-
-    //    Next = null;
-    //    Previous = lastPlatform;
-    //    lastPlatform.Next = this;
-    //}
-
-    //public void PlaceLastPlatform(IReadOnlyCollection<Transform> newPositions, Bounds gameBounds)
-    //{
-    //    int index = Random.Range(0, 2);
-    //    Vector3 newPosition = newPositions.ElementAt(index).position;
-    //    transform.localPosition = newPosition;
-
-    //    //if (gameBounds.Contains(BoundaryPoints.ElementAt(0).position) == false
-    //    //    || gameBounds.Contains(BoundaryPoints.ElementAt(1).position) == false)
-    //    //{
-    //    //    index = index == 0 ? 1 : 0;
-    //    //    transform.localPosition = newPositions.ElementAt(index).position;
-    //    //}
-    //}
-
-    private void CalculateGameBounds()
-    {
-        _gameBoundsCollider.center = Vector3.zero;
-        _gameBoundsCollider.size = Vector3.one;
-
-        Vector3 leftPoint = Camera.main.ViewportToWorldPoint(Vector3.zero);
-        Vector3 rightPoint = Camera.main.ViewportToWorldPoint(new Vector3(1f, 0f, 0f));
-
-        leftPoint.y = 0f;
-        rightPoint.y = 0f;
-
-        float xDistance = Vector3.Distance(leftPoint, rightPoint);
-        xDistance = xDistance == 0f ? 1f : xDistance;
-
-        float xFactor = 1 / xDistance;
-        xFactor = xFactor == 0f ? 1f : xFactor;
-
-        _gameBoundsCollider.size = new Vector3(
-            _gameBoundsCollider.size.x / xFactor,
-            _gameBoundsCollider.size.y * _boundsHight,
-            _gameBoundsCollider.size.z + _boundsLength
+        possiblePositions.firsPoint += new Vector3(
+            -(startPlatform.transform.localScale.x - _platformPrefab.transform.localScale.x) / 2, 0f, 0f
         );
 
-        float centerY = _gameBoundsCollider.transform.TransformPoint(Vector3.zero).y;
-        Vector3 centerOffset = new Vector3(0f, -centerY, _boundsLength / 2);
+        possiblePositions.secondPoint += new Vector3(
+            0f, 0f, (startPlatform.transform.localScale.z - _platformPrefab.transform.localScale.z) / 2
+        );
 
-        _gameBoundsCollider.center = _gameBoundsCollider.center + centerOffset;
-        _gameBounds = _gameBoundsCollider.bounds;
+        foreach (var platform in _platforms)
+        { 
+            SetNewPlatformPosition(platform, possiblePositions);
+
+            possiblePositions = platform.NextPlatformPositions;
+            _lastPlatform = platform;
+        }
+    }
+    
+    public void ReplacePlatform(ReusablePlatform platform)
+    {
+        SetNewPlatformPosition(platform, _lastPlatform.NextPlatformPositions);
+        
+        _lastPlatform = platform;
+    }
+    
+    private void SetNewPlatformPosition(ReusablePlatform platform, PointsInfo possiblePositions)
+    {
+        Vector3 GetPositionByIndex(int index)
+        {
+            if(index == 0) { return possiblePositions.firsPoint + _zOffset; }
+            else { return possiblePositions.secondPoint + _xOffset; }
+        }
+        
+        int index = UnityEngine.Random.Range(0, 2);
+        Vector3 newPosition = GetPositionByIndex(index);
+       
+        var colliders = Physics.OverlapBox(newPosition, _physicsBoxSize, _physicsBoxRotation, _physicsBoxMask);
+        
+        if (colliders.Length > 0)
+        {
+            index = index == 0 ? 1 : 0;
+            newPosition = GetPositionByIndex(index);
+        }
+
+        platform.transform.position = newPosition;
     }
 }

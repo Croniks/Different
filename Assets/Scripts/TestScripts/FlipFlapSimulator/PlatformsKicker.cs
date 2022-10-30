@@ -11,7 +11,7 @@ public class PlatformsKicker : MonoBehaviour
     public Dictionary<Collider, AbstractPlatform> kickablesDict = new Dictionary<Collider, AbstractPlatform>();
 
     
-    public void RegisterByCollider(Collider collider, AbstractPlatform kickable)
+    public void RegisterPlatformByCollider(Collider collider, AbstractPlatform kickable)
     {
         if(kickablesDict.ContainsKey(collider) == false)
         {

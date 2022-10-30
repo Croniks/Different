@@ -5,13 +5,6 @@ using DG.Tweening;
 using UnityEngine;
 
 
-[Serializable]
-public struct PointsInfo
-{
-    public Vector3 firsPoint;
-    public Vector3 secondPoint;
-}
-
 public abstract class AbstractPlatform : MonoBehaviour
 {
     [SerializeField] private float _kickingDuration = 1.5f;

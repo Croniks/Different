@@ -19,13 +19,13 @@ public class SphereController : MonoBehaviour
         _currentMoveDirecton = _initialDirection == MoveDirection.Right ? _rightMoveDirection : _rightMoveDirection * -1;
     }
 
-    private void Update()
+    public void Move()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             _currentMoveDirecton *= -1;
         }
-
+        
         _selfTransform.Translate(_currentMoveDirecton * _speed * Time.deltaTime, Space.Self);
     }
 }
