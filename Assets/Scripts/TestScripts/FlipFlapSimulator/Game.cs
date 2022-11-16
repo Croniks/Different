@@ -1,7 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
+using DG.Tweening;
 
 using UnityEngine;
 
@@ -51,7 +52,7 @@ public class Game : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
+            RestartGame();
         }
 
         _platformsMover.Move();
@@ -76,12 +77,14 @@ public class Game : MonoBehaviour
     {
         _platformsPlacer.PlatformCreated += OnPlatformCreated;
         _platformsKicker.PlatformKicked += OnPlatformKicked;
+        _sphereController.OutsideGround += OnGroundOutside;
     }
 
     private void RemoveHandlers()
     {
         _platformsPlacer.PlatformCreated -= OnPlatformCreated;
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
+        _sphereController.OutsideGround -= OnGroundOutside;
     }
 
     private void CreateGameBounds(Camera mainCamera)
@@ -99,13 +102,29 @@ public class Game : MonoBehaviour
         _leftBound.position = leftBoundPosition;
         _rightBound.position = rightBoundPosition;
 
-        _leftBound.localScale = localScale;
-        _rightBound.localScale = localScale;
+        _leftBound.localScale = _rightBound.localScale = localScale;
 
         Vector3 eulerAngles = new Vector3(0f, mainCamera.transform.eulerAngles.y, mainCamera.transform.eulerAngles.z);
 
-        _leftBound.eulerAngles = eulerAngles;
-        _rightBound.eulerAngles = eulerAngles;
+        _leftBound.eulerAngles = _rightBound.eulerAngles = eulerAngles;
+    }
+
+    private void RestartGame()
+    {
+        _sphereController.ResetState();
+        _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
+        _platformsMover.transform.localPosition = Vector3.zero;
+
+        enabled = true;
+    }
+
+    private void GameOver()
+    {
+        DOTween.Sequence()
+            .SetRecyclable(true)
+            .AppendInterval(5f)
+            .AppendCallback(() => { RestartGame(); })
+            .Play();
     }
 
     #endregion
@@ -123,6 +142,18 @@ public class Game : MonoBehaviour
         {
             _platformsPlacer.ReplacePlatform(reusablePlatform);
         }
+    }
+
+    private void OnGroundOutside()
+    {
+        enabled = false;
+        Debug.Log("Sphere fall!");
+        
+        _sphereController.LaunchFallAnimation(() => 
+        {
+            Debug.Log("Game over!");
+            GameOver();
+        });
     }
 
     #endregion

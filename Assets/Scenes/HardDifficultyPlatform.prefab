@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3221188998169441305}
   - component: {fileID: 3221188998169441309}
   - component: {fileID: 2977622427182157290}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: HardDifficultyPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,7 +34,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3221188998169441307
 MeshFilter:
@@ -127,9 +127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba36fb650b89808499bc5a0bf6806e03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _kickingDuration: 1.5
+  _kickingYEndPostion: -5
   _nextPlatformPositions:
     firsPoint: {x: 0, y: 0, z: 0.5}
     secondPoint: {x: -0.5, y: 0, z: 0}
-  _boundaryPoints:
-    firsPoint: {x: 0.5, y: 0, z: 0.5}
-    secondPoint: {x: -0.5, y: 0, z: -0.5}

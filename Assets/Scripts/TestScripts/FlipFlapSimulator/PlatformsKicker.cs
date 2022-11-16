@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+[RequireComponent(typeof(BoxCollider), typeof(Rigidbody))]
 public class PlatformsKicker : MonoBehaviour
 {
     public event Action<AbstractPlatform> PlatformKicked;

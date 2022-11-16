@@ -1,4 +1,8 @@
 using System;
+
+using Unity.VisualScripting;
+using Unity.VisualScripting.Dependencies.Sqlite;
+
 using UnityEngine;
 
 public enum LevelDifficulty { Easy = 0, Medium = 1, Hard = 2 };
