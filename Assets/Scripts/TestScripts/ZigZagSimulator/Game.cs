@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,10 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    public event Action GameStart;
+    public event Action GameFinish;
+
+    [SerializeField] private UIViewSwitcher _ui;
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
     [SerializeField] private AbstractPlatform _startPlatform;
     [SerializeField] private LevelDifficulty _currentLevelDifficulty;
@@ -25,6 +30,7 @@ public class Game : MonoBehaviour
     private PlatformsPlacer _platformsPlacer;
 
     [SerializeField, Space] private SphereController _sphereController;
+    [SerializeField] private bool _isPlay = true;
 
     
     #region UnityCalls
@@ -50,6 +56,9 @@ public class Game : MonoBehaviour
 
     private void Update()
     {
+        if(_isPlay == false)
+            return;
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             RestartGame();

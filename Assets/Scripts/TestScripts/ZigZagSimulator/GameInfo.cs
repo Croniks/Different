@@ -1,11 +1,8 @@
 using System;
-
-using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.Sqlite;
-
 using UnityEngine;
 
 public enum LevelDifficulty { Easy = 0, Medium = 1, Hard = 2 };
+public enum UIViewType { Menu, MenuButtons, MenuSettings, Preparation, Game };
 
 [Serializable]
 public struct PointsInfo
