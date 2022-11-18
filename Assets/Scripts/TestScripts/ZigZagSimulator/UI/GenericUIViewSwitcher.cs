@@ -18,10 +18,11 @@ public abstract class GenericUIViewSwitcher<ViewType, ViewBehaviour, View> : Mon
 
     [SerializeField] protected Animator _uiAnimator;
     [SerializeField] private List<ViewInfo> _viewInfos;
+    [SerializeField] private List<GenericUIButton<ViewType>> _buttons;
 
-    private Dictionary<ViewType, View> _viewsTypesAndViews = new Dictionary<ViewType, View>();
-   
-     
+    protected Dictionary<ViewType, View> _viewsTypesAndViews = new Dictionary<ViewType, View>();
+    
+    
     private void Awake()
     {
         SetupTypesAndViews(_viewInfos, _viewsTypesAndViews);
@@ -31,12 +32,14 @@ public abstract class GenericUIViewSwitcher<ViewType, ViewBehaviour, View> : Mon
     {
         var viewsBehaviours = _uiAnimator.GetBehaviours<ViewBehaviour>();
         SubscribeToViewBehaviours(viewsBehaviours, true);
+        SubscribeToButtons(_buttons, true);
     }
 
     private void OnDisable()
     {
         var viewsBehaviours = _uiAnimator.GetBehaviours<ViewBehaviour>();
         SubscribeToViewBehaviours(viewsBehaviours, false);
+        SubscribeToButtons(_buttons, false);
     }
 
     private void SetupTypesAndViews(IEnumerable<ViewInfo> viewsInfos, IDictionary<ViewType, View> viewsTypesAndViews)
@@ -62,8 +65,28 @@ public abstract class GenericUIViewSwitcher<ViewType, ViewBehaviour, View> : Mon
         }
     }
 
+    private void SubscribeToButtons(List<GenericUIButton<ViewType>> buttons, bool on)
+    {
+        foreach (var button in buttons)
+        {
+            if (on == true)
+            {
+                button.OnClickEvent += OnButtonClick;
+            }
+            else
+            {
+                button.OnClickEvent -= OnButtonClick;
+            }
+        }
+    }
+
     protected virtual void OnViewActivated(bool on, ViewType viewType)
     {
         _viewsTypesAndViews[viewType].ActivateView(on);
+    }
+
+    protected virtual void OnButtonClick(ViewType viewType)
+    {
+        _uiAnimator.SetTrigger(viewType.ToString());
     }
 }

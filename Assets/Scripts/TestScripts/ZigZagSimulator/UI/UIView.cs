@@ -2,20 +2,41 @@ using UnityEngine;
 using DG.Tweening;
 
 
-public class UIView : AbstractUIView
+public class UIView : AbstractUIView, ISetupable<SettingsObject>
 {
-    [SerializeField] private RectTransform viewTransform;
-    [SerializeField] private float activationDuration = 1f;
+    [SerializeField] private float _activationDuration = 1f;
+    [SerializeField] private AbstractViewContent<SettingsObject> _viewContent;
+
+    private RectTransform _viewTransform;
+
+
+    void Awake()
+    {
+        _viewTransform = GetComponent<RectTransform>();
+    }
 
     public override void ActivateView(bool on)
     {
-        Debug.Log($"gameObject.name : {gameObject.name}");
-        Debug.Log($"bool on : {on}");
-
         Vector3 scale = on == true ? Vector3.one : Vector3.zero;
 
-        viewTransform.DOScale(scale, activationDuration)
+        _viewTransform.DOScale(scale, _activationDuration)
             .SetRecyclable(true)
             .Play();
+    }
+
+    public void ResetContent()
+    {
+        if(_viewContent != null)
+        {
+            _viewContent.ResetContent();
+        }
+    }
+
+    public void SetupContent(SettingsObject settings)
+    {
+        if(_viewContent == null)
+        {
+            _viewContent.SetupContent(settings);
+        }
     }
 }

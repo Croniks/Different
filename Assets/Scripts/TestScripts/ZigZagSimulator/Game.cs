@@ -13,7 +13,7 @@ public class Game : MonoBehaviour
     public event Action GameStart;
     public event Action GameFinish;
 
-    [SerializeField] private UIViewSwitcher _ui;
+    [SerializeField] private UI _ui;
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
     [SerializeField] private AbstractPlatform _startPlatform;
     [SerializeField] private LevelDifficulty _currentLevelDifficulty;

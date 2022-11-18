@@ -49,7 +49,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: MenuSettingsView
+    m_ConditionEvent: MenuSettings
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2778354410670490260}
@@ -173,7 +173,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: PreparationView
+    m_ConditionEvent: Preparation
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -3992811855753340567}
@@ -198,36 +198,36 @@ AnimatorController:
   m_Name: UIAnimator
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: MenuView
+  - m_Name: Menu
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: PreparationView
+    m_Controller: {fileID: 0}
+  - m_Name: Preparation
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: GameView
+    m_Controller: {fileID: 0}
+  - m_Name: Game
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: MenuSettingsView
+    m_Controller: {fileID: 0}
+  - m_Name: MenuSettings
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: MenuButtonsView
+    m_Controller: {fileID: 0}
+  - m_Name: MenuButtons
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -255,7 +255,7 @@ AnimatorStateMachine:
     m_Position: {x: 460, y: -90, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2778354410670490260}
-    m_Position: {x: 710, y: 0, z: 0}
+    m_Position: {x: 710, y: 20, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 4484393381045046673}
     m_Position: {x: 710, y: -90, z: 0}
@@ -297,7 +297,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: MenuButtonsView
+    m_ConditionEvent: MenuButtons
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 4484393381045046673}
@@ -322,7 +322,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: GameView
+    m_ConditionEvent: Game
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 3377965382164204120}
@@ -513,7 +513,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: MenuView
+    m_ConditionEvent: Menu
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 5898393681998710904}
