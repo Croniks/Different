@@ -9,20 +9,25 @@ public class PlatformsKicker : MonoBehaviour
 {
     public event Action<AbstractPlatform> PlatformKicked;
 
-    public Dictionary<Collider, AbstractPlatform> kickablesDict = new Dictionary<Collider, AbstractPlatform>();
+    private Dictionary<Collider, AbstractPlatform> _kickablesDict = new Dictionary<Collider, AbstractPlatform>();
 
     
+    public void ResetPlatforms()
+    {
+        _kickablesDict.Clear();
+    }
+
     public void RegisterPlatformByCollider(Collider collider, AbstractPlatform kickable)
     {
-        if(kickablesDict.ContainsKey(collider) == false)
+        if(_kickablesDict.ContainsKey(collider) == false)
         {
-            kickablesDict.Add(collider, kickable);  
+            _kickablesDict.Add(collider, kickable);  
         }
     }
     
     private void OnTriggerEnter(Collider other)
     {
-        if(kickablesDict.TryGetValue(other, out AbstractPlatform platform))
+        if(_kickablesDict.TryGetValue(other, out AbstractPlatform platform))
         {
             platform.Kick(AfterKickAction);
         }

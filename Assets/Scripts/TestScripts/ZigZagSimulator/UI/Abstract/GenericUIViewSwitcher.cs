@@ -46,7 +46,11 @@ public abstract class GenericUIViewSwitcher<ViewType, ViewBehaviour, View> : Mon
     {
         foreach (var viewsInfo in viewsInfos)
         {
-            viewsTypesAndViews.Add(viewsInfo.Type, viewsInfo.View);
+            var viewType = viewsInfo.Type;
+            var view = viewsInfo.View;
+            view.transform.localScale = Vector3.zero;
+
+            viewsTypesAndViews.Add(viewType, view);
         }
     }
 
@@ -80,10 +84,7 @@ public abstract class GenericUIViewSwitcher<ViewType, ViewBehaviour, View> : Mon
         }
     }
 
-    protected virtual void OnViewActivated(bool on, ViewType viewType)
-    {
-        _viewsTypesAndViews[viewType].ActivateView(on);
-    }
+    protected abstract void OnViewActivated(bool on, ViewType viewType);
 
     protected virtual void OnButtonClick(ViewType viewType)
     {

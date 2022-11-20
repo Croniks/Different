@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 
+using UnityEditor;
+
 using UnityEngine;
 
 
@@ -32,6 +34,15 @@ public class PlatformsPlacer
 
         _zOffset = new Vector3(0, 0, _platformPrefab.transform.localScale.z / 2);
         _xOffset = new Vector3(-(_platformPrefab.transform.localScale.x / 2), 0, 0);
+    }
+
+    public void ResetPlatforms()
+    {
+        if(_platforms != null)
+        {
+            _platforms.ForEach(p => GameObject.Destroy(p.gameObject));
+            _platforms.Clear();
+        }
     }
 
     public void PlacePlatforms(Transform platformsParent, AbstractPlatform startPlatform)

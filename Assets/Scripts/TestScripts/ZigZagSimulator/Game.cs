@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 using DG.Tweening;
 
@@ -12,35 +10,35 @@ public class Game : MonoBehaviour
 {
     public event Action GameStart;
     public event Action GameFinish;
+    public event Action<int> ScoresReceived;
 
     [SerializeField] private UI _ui;
-    [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
+    [SerializeField] private SettingsObject _settings;
+    
     [SerializeField] private AbstractPlatform _startPlatform;
-    [SerializeField] private LevelDifficulty _currentLevelDifficulty;
-
-    [SerializeField] private float _boundsLength = 50f, _boundsHight = 2f;
-    [SerializeField] private int _maxPltaformsCount = 40;
 
     [SerializeField, Space] private Transform _leftBound;
     [SerializeField] private Transform _rightBound;
     [SerializeField] private LayerMask _borderCheckLayer;
+    private float _boundsHight;
+    private float _boundsLength;
 
     [SerializeField, Space] private PlatformsKicker _platformsKicker;
     [SerializeField] private PlatformsMover _platformsMover;
     private PlatformsPlacer _platformsPlacer;
 
     [SerializeField, Space] private SphereController _sphereController;
-    [SerializeField] private bool _isPlay = true;
-
     
+    private float _currentSphereSpeed = 1f;
+    private LevelDifficulty _currentLevelDifficulty;
+    private bool _playGame = false;
+
+
     #region UnityCalls
 
     private void Awake()
     {
-        var levelInfo = _levelsInfo.FirstOrDefault(li => li.levelDifficulty == _currentLevelDifficulty);
-        var platformsInfo = new PlatformsInfo(_maxPltaformsCount, levelInfo.platformPrefab);
-        
-        _platformsPlacer = new PlatformsPlacer(platformsInfo, _borderCheckLayer);
+        _settings.LoadSettings();
     }
     
     private IEnumerator Start()
@@ -50,22 +48,16 @@ public class Game : MonoBehaviour
         // Пропускаем один кадр, что бы посчитались границы уровня
         yield return null;
 
-        _platformsKicker.RegisterPlatformByCollider(_startPlatform.GetComponent<Collider>(), _startPlatform);
-        _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
+        Setup();
     }
 
     private void Update()
     {
-        if(_isPlay == false)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.R))
+        if(_playGame == true)
         {
-            RestartGame();
+            _platformsMover.Move();
+            _sphereController.Move();
         }
-
-        _platformsMover.Move();
-        _sphereController.Move();
     }
 
     private void OnEnable()
@@ -84,20 +76,51 @@ public class Game : MonoBehaviour
 
     private void AddHandlers()
     {
-        _platformsPlacer.PlatformCreated += OnPlatformCreated;
+        _ui.SizePlatformChanged += OnPlatformSizeChanged;
+        _ui.SphereSpeedChanged += OnSphereSpeedChanged;
+        _ui.TapedToStart += OnTapToStart;
+        _ui.SaveSettings += OnSaveSettings;
         _platformsKicker.PlatformKicked += OnPlatformKicked;
         _sphereController.OutsideGround += OnGroundOutside;
     }
 
     private void RemoveHandlers()
     {
-        _platformsPlacer.PlatformCreated -= OnPlatformCreated;
+        _ui.SizePlatformChanged -= OnPlatformSizeChanged;
+        _ui.SphereSpeedChanged -= OnSphereSpeedChanged;
+        _ui.TapedToStart -= OnTapToStart;
+        _ui.SaveSettings -= OnSaveSettings;
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
         _sphereController.OutsideGround -= OnGroundOutside;
     }
 
+    private void Setup()
+    {
+        _sphereController.Speed = _platformsMover.Speed = _settings.spehereSpeed;
+        _sphereController.ResetState();
+
+        _platformsMover.transform.localPosition = Vector3.zero;
+
+        if (_platformsPlacer != null)
+        {
+            _platformsPlacer.PlatformCreated -= OnPlatformCreated;
+            _platformsPlacer.ResetPlatforms();
+        }
+
+        var platformsInfo = new PlatformsInfo(_settings.MaxPltaformsCount, _settings.PlatformPrefab);
+        _platformsPlacer = new PlatformsPlacer(platformsInfo, _borderCheckLayer);
+        _platformsPlacer.PlatformCreated += OnPlatformCreated;
+        
+        _platformsKicker.ResetPlatforms();
+        _platformsKicker.RegisterPlatformByCollider(_startPlatform.GetComponent<Collider>(), _startPlatform);
+        _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
+    }
+
     private void CreateGameBounds(Camera mainCamera)
     {
+        _boundsHight = _settings.BoundsHight;
+        _boundsLength = _settings.BoundsLength;
+
         float zDistance = Vector3.Distance(mainCamera.transform.position, _startPlatform.transform.position);
         Vector3 leftBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, zDistance));
         Vector3 rightBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, zDistance));
@@ -118,27 +141,58 @@ public class Game : MonoBehaviour
         _leftBound.eulerAngles = _rightBound.eulerAngles = eulerAngles;
     }
 
-    private void RestartGame()
-    {
-        _sphereController.ResetState();
-        _platformsPlacer.PlacePlatforms(_platformsMover.transform, _startPlatform);
-        _platformsMover.transform.localPosition = Vector3.zero;
-
-        enabled = true;
-    }
-
     private void GameOver()
     {
         DOTween.Sequence()
             .SetRecyclable(true)
             .AppendInterval(5f)
-            .AppendCallback(() => { RestartGame(); })
+            .AppendCallback(() => { Setup(); })
+            .OnComplete(() => { GameFinish?.Invoke(); })
             .Play();
     }
 
     #endregion
 
     #region EventHandlers
+
+    private void OnTapToStart()
+    {
+        _playGame = true;
+        GameStart?.Invoke();
+    }
+
+    private void OnSphereSpeedChanged(float value)
+    {
+        _settings.spehereSpeed = value;
+    }
+
+    private void OnPlatformSizeChanged(LevelDifficulty value)
+    {
+        _settings.levelDifficulty = value;
+    }
+
+    private void OnSaveSettings()
+    {
+        bool settignsWasChanged = false;
+
+        if(_currentSphereSpeed != _settings.spehereSpeed)
+        {
+            _currentSphereSpeed = _settings.spehereSpeed;
+            settignsWasChanged = true;
+        }
+
+        if(_currentLevelDifficulty != _settings.levelDifficulty)
+        {
+            _currentLevelDifficulty = _settings.levelDifficulty;
+            settignsWasChanged = true;
+        }
+
+        if(settignsWasChanged == true)
+        {
+            _settings.SaveSettings();
+            Setup();
+        }
+    }
 
     private void OnPlatformCreated(ReusablePlatform platform)
     {
@@ -155,12 +209,10 @@ public class Game : MonoBehaviour
 
     private void OnGroundOutside()
     {
-        enabled = false;
-        Debug.Log("Sphere fall!");
+        _playGame = false;
         
         _sphereController.LaunchFallAnimation(() => 
         {
-            Debug.Log("Game over!");
             GameOver();
         });
     }

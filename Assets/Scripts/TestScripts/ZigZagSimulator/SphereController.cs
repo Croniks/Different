@@ -11,6 +11,7 @@ public class SphereController : MonoBehaviour
 {
     public event Action OutsideGround;
 
+    public float Speed { get => _speed; set => _speed = value; }
     [SerializeField] private float _speed;
     [SerializeField] private MoveDirection _initialDirection = MoveDirection.Right;
     [SerializeField] private Vector3 _rightMoveDirection;

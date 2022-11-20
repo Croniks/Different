@@ -29,3 +29,9 @@ public class PlatformsInfo
         this.platformPrefab = platformPrefab;
     }
 }
+
+public class PlayerPrefsSettingsNames
+{
+    public static string LevelDifficulty => "LevelDifficulty";
+    public static string SphereSpeed => "SphereSpeed";
+}
