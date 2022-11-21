@@ -103,6 +103,13 @@ public class PlatformsPlacer
        
         var colliders = Physics.OverlapBox(newPosition, _physicsBoxSize, _physicsBoxRotation, _physicsBoxMask);
         
+        // Дебаг
+        //var gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        //gameObject.transform.position = newPosition;
+        //gameObject.transform.localScale = _physicsBoxSize;
+        //gameObject.transform.rotation = _physicsBoxRotation;
+        /////////////////////////////////////////////////////
+
         if (colliders.Length > 0)
         {
             index = index == 0 ? 1 : 0;

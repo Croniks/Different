@@ -392,7 +392,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 1
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -2681,6 +2681,7 @@ MonoBehaviour:
   _textForScrollbar: {fileID: 1718100331}
   _stepsValues:
   - 1
+  - 1.25
   - 1.5
   - 2
 --- !u!1 &1105365397
@@ -2972,6 +2973,7 @@ MonoBehaviour:
   _platformsKicker: {fileID: 1707512639}
   _platformsMover: {fileID: 315007519}
   _sphereController: {fileID: 382344150}
+  _playGame: 0
 --- !u!1 &1192564226
 GameObject:
   m_ObjectHideFlags: 0
@@ -4533,8 +4535,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 90
-  m_fontSizeBase: 90
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

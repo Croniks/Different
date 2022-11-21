@@ -23,7 +23,8 @@ public class SphereController : MonoBehaviour
     private Vector3 _initialPosition;
     
     private ISettingsGetter _settingsGetter;
-
+   
+    
     private void Awake()
     {
         _selfTransform = GetComponent<Transform>();
@@ -44,7 +45,7 @@ public class SphereController : MonoBehaviour
 
     public void Move()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetMouseButtonDown(0))
         {
             _currentMoveDirecton *= -1;
         }

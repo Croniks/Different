@@ -111,11 +111,11 @@ public class Game : MonoBehaviour
         Vector3 leftBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(0f, 0.5f, zDistance));
         Vector3 rightBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, zDistance));
 
-        Vector3 localScale = new Vector3(1, _boundsHeight, _boundsLength);
-        Vector3 xPositionOffest = new Vector3(localScale.x / 1.5f, 0f, 0f);
+        Vector3 localScale = new Vector3(0.05f, _boundsHeight, _boundsLength);
+        //Vector3 xPositionOffest = new Vector3(localScale.x / 1.5f, 0f, 0f);
 
-        leftBoundPosition = leftBoundPosition - xPositionOffest;
-        rightBoundPosition = rightBoundPosition + xPositionOffest;
+        //leftBoundPosition = leftBoundPosition - xPositionOffest;
+        //rightBoundPosition = rightBoundPosition + xPositionOffest;
 
         _leftBound.position = leftBoundPosition;
         _rightBound.position = rightBoundPosition;
