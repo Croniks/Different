@@ -1,17 +1,15 @@
 using System;
 
-using DG.Tweening;
-
 using UnityEngine;
 
+using DG.Tweening;
 
-public enum MoveDirection { Right = 0, Left = 1 };
 
 public class SphereController : MonoBehaviour
 {
-    public event Action OutsideGround;
+    public event Action SphereOutsidePlatform;
+    public event Action<int> ScoresReceived;
 
-    public float Speed { get => _speed; set => _speed = value; }
     [SerializeField] private float _speed;
     [SerializeField] private MoveDirection _initialDirection = MoveDirection.Right;
     [SerializeField] private Vector3 _rightMoveDirection;
@@ -24,12 +22,24 @@ public class SphereController : MonoBehaviour
     private Vector3 _currentMoveDirecton;
     private Vector3 _initialPosition;
     
+    private ISettingsGetter _settingsGetter;
 
     private void Awake()
     {
         _selfTransform = GetComponent<Transform>();
         _currentMoveDirecton = _initialDirection == MoveDirection.Right ? _rightMoveDirection : _rightMoveDirection * -1;
         _initialPosition = _selfTransform.position;
+    }
+
+    private void Start()
+    {
+        _speed = _settingsGetter.MoveSpeed;
+    }
+
+    public void Construct(ISettingsGetter settingsGetter)
+    {
+        _settingsGetter = settingsGetter;
+        _settingsGetter.SettingsChanged += OnSettingsChanged;
     }
 
     public void Move()
@@ -43,7 +53,7 @@ public class SphereController : MonoBehaviour
 
         if(CheckGround() == false)
         {
-            OutsideGround?.Invoke();
+            SphereOutsidePlatform?.Invoke();
         }
     }
 
@@ -67,5 +77,10 @@ public class SphereController : MonoBehaviour
     {
         _currentMoveDirecton = _initialDirection == MoveDirection.Right ? _rightMoveDirection : _rightMoveDirection * -1;
         _selfTransform.position = _initialPosition;
+    }
+
+    private void OnSettingsChanged()
+    {
+        _speed = _settingsGetter.MoveSpeed;
     }
 }

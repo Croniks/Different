@@ -2,12 +2,10 @@ using System;
 
 using UnityEngine;
 
+
 public class UI : MonoBehaviour
 {
-    public event Action<LevelDifficulty> SizePlatformChanged;
-    public event Action<float> SphereSpeedChanged;
     public event Action TapedToStart;
-    public event Action SaveSettings;
     
     [SerializeField] private Game _game;
     [SerializeField] private UIViewSwitcher _uIViewSwitcher;
@@ -16,16 +14,27 @@ public class UI : MonoBehaviour
     [SerializeField] private SaveSettingsButton _saveSettingsButton;
     [SerializeField] private TapToStartButton _tapToStartButton;
     
+    private ISettingsGetter _settingsGetter;
+    private ISettingsSetter _settingsSetter;
 
     private void Start()
     {
         _game.GameStart += OnGameStarted;
         _game.GameFinish += OnGameFinished;
         _game.ScoresReceived += OnScoresReceived;
-        _menuUIView.SphereSpeedChanged += OnSphereSpeedChanged;
+        _menuUIView.MoveSpeedChanged += OnMoveSpeedChanged;
         _menuUIView.SizePlatformChanged += OnPlatformSizeChanged;
         _saveSettingsButton.SaveSettings += OnSaveSettings;
         _tapToStartButton.TapToStart += OnTappedToStart;
+        
+        _menuUIView.SetMoveSpeed(_settingsGetter.MoveSpeed);
+        _menuUIView.SetPlatformSize(_settingsGetter.PlatformSize);
+    }
+
+    public void Construct(ISettingsGetter settingsGetter, ISettingsSetter settingsSetter)
+    {
+        _settingsGetter = settingsGetter;
+        _settingsSetter = settingsSetter;
     }
 
     private void OnGameStarted()
@@ -48,18 +57,18 @@ public class UI : MonoBehaviour
         TapedToStart?.Invoke();
     }
 
-    private void OnSphereSpeedChanged(float value)
+    private void OnMoveSpeedChanged(float value)
     {
-        SphereSpeedChanged?.Invoke(value);
+        _settingsSetter.MoveSpeed = value;
     }
 
-    private void OnPlatformSizeChanged(LevelDifficulty value)
+    private void OnPlatformSizeChanged(PlatformSize value)
     {
-        SizePlatformChanged?.Invoke(value);
+        _settingsSetter.PlatformSize = value;
     }
 
     private void OnSaveSettings()
     {
-        SaveSettings?.Invoke();
+        _settingsSetter.SaveSettings(); ;
     }
 }

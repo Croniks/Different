@@ -451,7 +451,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 36420475}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 3c0d65689e9c40a48bcd0a4019100ed5, type: 2}
   m_CullingMode: 0
@@ -505,6 +505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _game: {fileID: 1188481444}
+  _uIViewSwitcher: {fileID: 36420481}
   _gameUIView: {fileID: 748730472}
   _menuUIView: {fileID: 50736110}
   _saveSettingsButton: {fileID: 1223190262}
@@ -1365,7 +1366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa07b6ee3361689408bca302bac3568a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelDifficulty: 0
+  _levelDifficulty: 2
 --- !u!1 &572594632
 GameObject:
   m_ObjectHideFlags: 0
@@ -3412,7 +3413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa07b6ee3361689408bca302bac3568a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelDifficulty: 2
+  _levelDifficulty: 0
 --- !u!1 &1349128381
 GameObject:
   m_ObjectHideFlags: 0

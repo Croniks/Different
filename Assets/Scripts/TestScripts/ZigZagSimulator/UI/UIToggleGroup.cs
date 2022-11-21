@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class UIToggleGroup : MonoBehaviour
 {
-    public event Action<LevelDifficulty> PlatformSizeSettingChanged;
+    public event Action<PlatformSize> PlatformSizeSettingChanged;
 
     [SerializeField] private List<UIToggle> _toggles;
 
@@ -15,12 +15,12 @@ public class UIToggleGroup : MonoBehaviour
     {
         _toggles.ForEach(t => 
         {
-            t.IsOn = t.LevelDifficulty == LevelDifficulty.Hard;
+            //t.IsOn = t.LevelDifficulty == PlatformSize.Small;
             t.ToggleOn += OnToggle; 
         });
     }
 
-    public void SetPlatformSize(LevelDifficulty levelDifficulty)
+    public void SetPlatformSize(PlatformSize levelDifficulty)
     {
         _toggles.ForEach(t =>
         {
@@ -28,8 +28,8 @@ public class UIToggleGroup : MonoBehaviour
         });
     }
 
-    private void OnToggle(LevelDifficulty levelDifficulty)
+    private void OnToggle(PlatformSize platformSize)
     {
-        PlatformSizeSettingChanged?.Invoke(levelDifficulty);
+        PlatformSizeSettingChanged?.Invoke(platformSize);
     }
 }

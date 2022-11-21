@@ -6,10 +6,10 @@ using UnityEngine.UI;
 
 public class UIToggle : MonoBehaviour
 {
-    public event Action<LevelDifficulty> ToggleOn;
+    public event Action<PlatformSize> ToggleOn;
 
-    public LevelDifficulty LevelDifficulty => _levelDifficulty;
-    [SerializeField] private LevelDifficulty _levelDifficulty;
+    public PlatformSize LevelDifficulty => _levelDifficulty;
+    [SerializeField] private PlatformSize _levelDifficulty;
 
     public bool IsOn { get => _toggle; set => _toggle.SetIsOnWithoutNotify(value); }
     private Toggle _toggle;

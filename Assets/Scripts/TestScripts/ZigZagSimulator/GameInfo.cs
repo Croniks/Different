@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
 
-public enum LevelDifficulty { Easy = 0, Medium = 1, Hard = 2 };
+public enum PlatformSize { Small = 0, Medium = 1, Large = 2 };
 public enum UIViewType { Menu, MenuButtons, MenuSettings, Preparation, Game };
+
+public enum MoveDirection { Right = 0, Left = 1 };
 
 [Serializable]
 public struct PointsInfo
@@ -14,7 +16,7 @@ public struct PointsInfo
 [Serializable]
 public class LevelInfo
 {
-    public LevelDifficulty levelDifficulty;
+    public PlatformSize levelDifficulty;
     public ReusablePlatform platformPrefab;
 }
 
@@ -33,5 +35,5 @@ public class PlatformsInfo
 public class PlayerPrefsSettingsNames
 {
     public static string LevelDifficulty => "LevelDifficulty";
-    public static string SphereSpeed => "SphereSpeed";
+    public static string MoveSpeed => "SphereSpeed";
 }

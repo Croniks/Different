@@ -1,45 +1,63 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Settings", menuName = "ScriptableObjects/Settings", order = 1)]
-public class SettingsObject : ScriptableObject
+public class SettingsObject : ScriptableObject, ISettingsGetter, ISettingsSetter
 {
-    public float spehereSpeed = 1f;
-    public LevelDifficulty levelDifficulty = LevelDifficulty.Hard;
+    public event Action SettingsChanged;
 
-    public ReusablePlatform PlatformPrefab => _levelsInfo.FirstOrDefault(li => li.levelDifficulty == levelDifficulty).platformPrefab;
+    public float MoveSpeed { get => _moveSpeed; set => _moveSpeed = value; }
+    [SerializeField, Range(1f, 2f)] private float _moveSpeed = 1f;
+
+    public PlatformSize PlatformSize { get => _platformSize; set => _platformSize = value; }
+    [SerializeField] private PlatformSize _platformSize = PlatformSize.Large;
+
+    public ReusablePlatform PlatformPrefab => _levelsInfo.FirstOrDefault(li => li.levelDifficulty == _platformSize).platformPrefab;
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
 
-    public float BoundsLength => _boundsLength;
+    public float BoundsLength { get => _boundsLength; set => _boundsLength = value; }
     [SerializeField] private float _boundsLength = 100f;
 
-    public float BoundsHight => _boundsLength;
-    [SerializeField] private float _boundsHight = 5f;
+    public float BoundsHeight { get => _boundsHeight; set => _boundsHeight = value; }
+    [SerializeField] private float _boundsHeight = 5f;
 
-    public int MaxPltaformsCount => _maxPltaformsCount;
+    public int MaxPltaformsCount { get => _maxPltaformsCount; set => _maxPltaformsCount = value; }
     [SerializeField] private int _maxPltaformsCount = 40;
 
+    [SerializeField] private bool _overridePlayerPrefs = false;
+
+    
+    public void SaveSettings()
+    {
+        if (_overridePlayerPrefs == false)
+        {
+            PlayerPrefs.SetFloat(PlayerPrefsSettingsNames.MoveSpeed, _moveSpeed);
+            PlayerPrefs.SetInt(PlayerPrefsSettingsNames.LevelDifficulty, (int)_platformSize);
+
+            PlayerPrefs.Save();
+        }
+        
+        SettingsChanged?.Invoke();
+    }
 
     public void LoadSettings()
     {
-        if (PlayerPrefs.HasKey(PlayerPrefsSettingsNames.SphereSpeed))
+        if (_overridePlayerPrefs == true)
         {
-            spehereSpeed = PlayerPrefs.GetFloat(PlayerPrefsSettingsNames.SphereSpeed);
+            return;
+        }
+
+        if (PlayerPrefs.HasKey(PlayerPrefsSettingsNames.MoveSpeed))
+        {
+            _moveSpeed = PlayerPrefs.GetFloat(PlayerPrefsSettingsNames.MoveSpeed);
         }
         
         if (PlayerPrefs.HasKey(PlayerPrefsSettingsNames.LevelDifficulty))
         {
-            levelDifficulty = (LevelDifficulty)PlayerPrefs.GetInt(PlayerPrefsSettingsNames.LevelDifficulty);
+            _platformSize = (PlatformSize)PlayerPrefs.GetInt(PlayerPrefsSettingsNames.LevelDifficulty);
         }
-    }
-    
-    public void SaveSettings()
-    {
-        PlayerPrefs.SetFloat(PlayerPrefsSettingsNames.SphereSpeed, spehereSpeed);
-        PlayerPrefs.SetInt(PlayerPrefsSettingsNames.LevelDifficulty, (int)levelDifficulty);
-
-        PlayerPrefs.Save();
     }
 }

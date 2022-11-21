@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class MenuUIView : UIView
 {
-    public event Action<LevelDifficulty> SizePlatformChanged;
-    public event Action<float> SphereSpeedChanged;
+    public event Action<PlatformSize> SizePlatformChanged;
+    public event Action<float> MoveSpeedChanged;
 
     [SerializeField] private UIScrollBar _scrollBar;
     [SerializeField] private UIToggleGroup _toggleGroup;
@@ -14,16 +14,26 @@ public class MenuUIView : UIView
 
     private void Start()
     {
-        _scrollBar.SphereSpeedSettingChanged += OnSphereSpeedSettingChanged;
+        _scrollBar.MoveSpeedChanged += OnMoveSpeedChanged;
         _toggleGroup.PlatformSizeSettingChanged += OnPlatformSizeSettingChanged;
     }
-    
-    private void OnSphereSpeedSettingChanged(float value)
+
+    public void SetMoveSpeed(float value)
     {
-        SphereSpeedChanged?.Invoke(value);
+        _scrollBar.SetMoveSpeed(value);
     }
 
-    private void OnPlatformSizeSettingChanged(LevelDifficulty value)
+    public void SetPlatformSize(PlatformSize platformSize)
+    {
+        _toggleGroup.SetPlatformSize(platformSize);
+    }
+
+    private void OnMoveSpeedChanged(float value)
+    {
+        MoveSpeedChanged?.Invoke(value);
+    }
+
+    private void OnPlatformSizeSettingChanged(PlatformSize value)
     {
         SizePlatformChanged?.Invoke(value);
     }

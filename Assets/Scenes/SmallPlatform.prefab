@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3221188998169441309}
   - component: {fileID: 2977622427182157290}
   m_Layer: 7
-  m_Name: HardDifficultyPlatform
+  m_Name: SmallPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

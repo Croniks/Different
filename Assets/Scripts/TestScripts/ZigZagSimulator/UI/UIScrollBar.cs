@@ -6,7 +6,7 @@ using System;
 
 public class UIScrollBar : MonoBehaviour
 {
-    public event Action <float> SphereSpeedSettingChanged;
+    public event Action <float> MoveSpeedChanged;
 
     [SerializeField] private TextMeshProUGUI _textForScrollbar;
     [SerializeField] private float[] _stepsValues;
@@ -26,7 +26,7 @@ public class UIScrollBar : MonoBehaviour
         DisplayValue(_scrollbar.value);
     }
 
-    public void SetSphereSpeed(float value)
+    public void SetMoveSpeed(float value)
     {
         var startValue = _stepsValues[0];
         var endValue = _stepsValues[_stepsValues.Length - 1];
@@ -35,7 +35,7 @@ public class UIScrollBar : MonoBehaviour
         if (endValue < startValue) endValue = startValue;
 
         var displayedValue = Mathf.Clamp(value, startValue, endValue);
-        var scrollBarValue = (endValue - displayedValue) / (endValue - startValue);
+        var scrollBarValue = Mathf.InverseLerp(startValue, endValue, displayedValue);
 
         _textForScrollbar.text = displayedValue.ToString();
         _scrollbar.SetValueWithoutNotify(scrollBarValue);
@@ -56,6 +56,6 @@ public class UIScrollBar : MonoBehaviour
     {
         var resultValue = DisplayValue(value);
 
-        SphereSpeedSettingChanged?.Invoke(resultValue);
+        MoveSpeedChanged?.Invoke(resultValue);
     }
 }
