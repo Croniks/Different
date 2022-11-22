@@ -21,6 +21,7 @@ public class SphereController : MonoBehaviour
     private Transform _selfTransform;
     private Vector3 _currentMoveDirecton;
     private Vector3 _initialPosition;
+    private float _speedMultiplier = 0f;
     
     private ISettingsGetter _settingsGetter;
    
@@ -49,8 +50,14 @@ public class SphereController : MonoBehaviour
         {
             _currentMoveDirecton *= -1;
         }
-        
-        _selfTransform.Translate(_currentMoveDirecton * _speed * Time.deltaTime, Space.Self);
+
+        _speedMultiplier += Time.deltaTime / 2f;
+        if (_speedMultiplier > 1)
+        {
+            _speedMultiplier = 1f;
+        }
+
+        _selfTransform.Translate(_currentMoveDirecton * _speed * _speedMultiplier * Time.deltaTime, Space.Self);
 
         if(CheckGround() == false)
         {
@@ -78,6 +85,7 @@ public class SphereController : MonoBehaviour
     {
         _currentMoveDirecton = _initialDirection == MoveDirection.Right ? _rightMoveDirection : _rightMoveDirection * -1;
         _selfTransform.position = _initialPosition;
+        _speedMultiplier = 0f;
     }
 
     private void OnSettingsChanged()

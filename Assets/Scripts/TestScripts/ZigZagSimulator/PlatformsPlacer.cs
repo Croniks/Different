@@ -117,5 +117,17 @@ public class PlatformsPlacer
         }
 
         platform.transform.position = newPosition;
+
+        PlaceCapsuleOnPlatform(platform);
+    }
+
+    private void PlaceCapsuleOnPlatform(ReusablePlatform platform)
+    {
+        CapsulePlacer capsulePlacer = null;
+
+        if(capsulePlacer != null)
+        {
+            capsulePlacer.SetCapsuleOnPlatform(platform);
+        }
     }
 }
