@@ -8,8 +8,7 @@ using DG.Tweening;
 public class SphereController : MonoBehaviour
 {
     public event Action SphereOutsidePlatform;
-    public event Action<int> ScoresReceived;
-
+    
     [SerializeField] private float _speed;
     [SerializeField] private MoveDirection _initialDirection = MoveDirection.Right;
     [SerializeField] private Vector3 _rightMoveDirection;
@@ -24,7 +23,7 @@ public class SphereController : MonoBehaviour
     private float _speedMultiplier = 0f;
     
     private ISettingsGetter _settingsGetter;
-   
+    
     
     private void Awake()
     {

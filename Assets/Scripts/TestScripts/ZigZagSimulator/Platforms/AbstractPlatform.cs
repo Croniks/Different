@@ -13,7 +13,16 @@ public abstract class AbstractPlatform : MonoBehaviour
     [SerializeField] private PointsInfo _nextPlatformPositions;
     public PointsInfo NextPlatformPositions => ConvertPoints(_nextPlatformPositions);
 
+    public int ID => id;
+    private int id = -1;
     
+    private static int _id = -1;
+
+    private void Awake()
+    {
+        id = ++_id;
+    }
+
     public virtual void Kick(Action<AbstractPlatform> afterKickAction)
     {
         transform
@@ -44,22 +53,4 @@ public abstract class AbstractPlatform : MonoBehaviour
         Gizmos.DrawSphere(nextPoints.firsPoint, rad);
         Gizmos.DrawSphere(nextPoints.secondPoint, rad);
     }
-
-    //#if UNITY_EDITOR 
-
-    //protected void OnMouseOver()
-    //{
-    //    if (Input.GetMouseButtonDown(0))
-    //    {
-    //        Vector3 initialPosition = transform.position;
-    //        Kick((platform) => 
-    //        {
-    //            Debug.Log($"{platform.name} was kicked !!!");
-
-    //            transform.position = initialPosition;
-    //        });
-    //    }
-    //}
-
-    //#endif
 }

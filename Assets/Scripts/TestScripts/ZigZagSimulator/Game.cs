@@ -17,7 +17,8 @@ public class Game : MonoBehaviour
     
     [SerializeField] private AbstractPlatform _startPlatform;
 
-    [SerializeField, Space] private Transform _leftBound;
+    [SerializeField, Space] private Transform _capsulesContainer;
+    [SerializeField] private Transform _leftBound;
     [SerializeField] private Transform _rightBound;
     [SerializeField] private LayerMask _borderCheckLayer;
     
@@ -30,6 +31,7 @@ public class Game : MonoBehaviour
     private ReusablePlatform _platformPrefab;
     private PlatformSize _currentPlatformSize;
     private PlatformsPlacer _platformsPlacer;
+    private CapsulePlacer _capsulePlacer;
     private float _boundsHeight;
     private float _boundsLength;
 
@@ -60,7 +62,7 @@ public class Game : MonoBehaviour
         // Пропускаем один кадр, что бы посчитались границы уровня
         yield return null;
 
-        CreatePlatforms();
+        SetupGameComponents();
     }
 
     private void Update()
@@ -90,6 +92,7 @@ public class Game : MonoBehaviour
     {
         _settingsGetter.SettingsChanged += OnSettingsChanged;
         _ui.TapedToStart += OnTapToStart;
+        _platformsKicker.PlatformKicking += OnPlatformKicking;
         _platformsKicker.PlatformKicked += OnPlatformKicked;
         _sphereController.SphereOutsidePlatform += OnSphereOutsidePlatform;
     }
@@ -98,6 +101,7 @@ public class Game : MonoBehaviour
     {
         _settingsGetter.SettingsChanged -= OnSettingsChanged;
         _ui.TapedToStart -= OnTapToStart;
+        _platformsKicker.PlatformKicking -= OnPlatformKicking;
         _platformsKicker.PlatformKicked -= OnPlatformKicked;
         _sphereController.SphereOutsidePlatform -= OnSphereOutsidePlatform;
     }
@@ -112,10 +116,6 @@ public class Game : MonoBehaviour
         Vector3 rightBoundPosition = mainCamera.ViewportToWorldPoint(new Vector3(1f, 0.5f, zDistance));
 
         Vector3 localScale = new Vector3(0.05f, _boundsHeight, _boundsLength);
-        //Vector3 xPositionOffest = new Vector3(localScale.x / 1.5f, 0f, 0f);
-
-        //leftBoundPosition = leftBoundPosition - xPositionOffest;
-        //rightBoundPosition = rightBoundPosition + xPositionOffest;
 
         _leftBound.position = leftBoundPosition;
         _rightBound.position = rightBoundPosition;
@@ -127,7 +127,7 @@ public class Game : MonoBehaviour
         _leftBound.eulerAngles = _rightBound.eulerAngles = eulerAngles;
     }
 
-    private void CreatePlatforms()
+    private void SetupGameComponents()
     {
         if (_platformsPlacer != null)
         {
@@ -135,9 +135,18 @@ public class Game : MonoBehaviour
             _platformsPlacer.ResetPlatforms();
         }
 
+        if(_capsulePlacer == null)
+        {
+            _capsulePlacer = new CapsulePlacer(_settings.Capsule, _capsulesContainer, _settings.MaxCapsulesCount);
+            _capsulePlacer.ScoresForCapsuleReceived += OnScoresReceived;
+        }
+
+        _capsulePlacer.ResetCapsules();
+
         var platformsInfo = new PlatformsInfo(_settingsGetter.MaxPltaformsCount, _platformPrefab);
         _platformsPlacer = new PlatformsPlacer(platformsInfo, _borderCheckLayer);
         _platformsPlacer.PlatformCreated += OnPlatformCreated;
+        _platformsPlacer.PlatformPlaced += OnPlatformPlaced;
 
         _platformsKicker.ResetPlatforms();
         _platformsKicker.RegisterPlatformByCollider(_startPlatform.GetComponent<Collider>(), _startPlatform);
@@ -164,7 +173,7 @@ public class Game : MonoBehaviour
         _sphereController.ResetState();
         _platformsMover.ResetState();
 
-        CreatePlatforms();
+        SetupGameComponents();
     }
 
     #endregion
@@ -184,7 +193,7 @@ public class Game : MonoBehaviour
             _currentPlatformSize = _settingsGetter.PlatformSize;
             _platformPrefab = _settingsGetter.PlatformPrefab;
 
-            CreatePlatforms();
+            SetupGameComponents();
         }
     }
 
@@ -193,8 +202,23 @@ public class Game : MonoBehaviour
         _platformsKicker.RegisterPlatformByCollider(platform.GetComponent<Collider>(), platform);
     }
 
+    private void OnPlatformPlaced(ReusablePlatform platform)
+    {
+        _capsulePlacer.PlaceCapsuleOnPlatform(platform);
+    }
+
+    private void OnPlatformKicking(AbstractPlatform platform)
+    {
+        // Нарушение Лисков, но один раз можно :)
+        if (platform is ReusablePlatform reusablePlatform)
+        {
+            _capsulePlacer.CheckFallingPlatformForPresenceCapsule(reusablePlatform);
+        }
+    }
+
     private void OnPlatformKicked(AbstractPlatform platform)
     {
+        // Нарушение Лисков, но один раз можно :)
         if (platform is ReusablePlatform reusablePlatform)
         {
             _platformsPlacer.ReplacePlatform(reusablePlatform);
@@ -209,6 +233,11 @@ public class Game : MonoBehaviour
         {
             GameOver();
         });
+    }
+
+    private void OnScoresReceived(int scores)
+    {
+        ScoresReceived?.Invoke(scores);
     }
 
     #endregion

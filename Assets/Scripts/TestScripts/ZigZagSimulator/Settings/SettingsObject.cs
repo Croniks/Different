@@ -18,6 +18,12 @@ public class SettingsObject : ScriptableObject, ISettingsGetter, ISettingsSetter
     public ReusablePlatform PlatformPrefab => _levelsInfo.FirstOrDefault(li => li.levelDifficulty == _platformSize).platformPrefab;
     [SerializeField] private List<LevelInfo> _levelsInfo = new List<LevelInfo>();
 
+    public Capsule Capsule => _capsule;
+    [SerializeField] private Capsule _capsule;
+
+    public int MaxCapsulesCount { get => _maxCapsulesCount; set => _maxCapsulesCount = value; }
+    [SerializeField] private int _maxCapsulesCount = 20;
+
     public float BoundsLength { get => _boundsLength; set => _boundsLength = value; }
     [SerializeField] private float _boundsLength = 100f;
 

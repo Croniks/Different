@@ -21,6 +21,8 @@ MonoBehaviour:
     platformPrefab: {fileID: 1549637684268497800, guid: dbb026b9d05d2ef47b816ea35a07d945, type: 3}
   - levelDifficulty: 2
     platformPrefab: {fileID: 6807961965993044466, guid: 4f73115c795c26043b1b3daa86e06d94, type: 3}
+  _capsule: {fileID: 5718895955728756554, guid: 1335c2c28fadd8648999be361d940c8f, type: 3}
+  _maxCapsulesCount: 10
   _boundsLength: 120
   _boundsHeight: 5
   _maxPltaformsCount: 50

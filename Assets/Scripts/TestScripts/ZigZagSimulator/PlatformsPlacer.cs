@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-using UnityEditor;
-
 using UnityEngine;
 
 
 public class PlatformsPlacer
 {
     public event Action<ReusablePlatform> PlatformCreated;
+    public event Action<ReusablePlatform> PlatformPlaced;
 
     private int _maxPltaformsCount;
     private ReusablePlatform _platformPrefab;
@@ -21,7 +20,7 @@ public class PlatformsPlacer
 
     private List<ReusablePlatform> _platforms;
     private ReusablePlatform _lastPlatform = null;
-
+    
     
     public PlatformsPlacer(PlatformsInfo platformsInfo, LayerMask borderCheckLayer)
     {
@@ -103,13 +102,6 @@ public class PlatformsPlacer
        
         var colliders = Physics.OverlapBox(newPosition, _physicsBoxSize, _physicsBoxRotation, _physicsBoxMask);
         
-        // Дебаг
-        //var gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //gameObject.transform.position = newPosition;
-        //gameObject.transform.localScale = _physicsBoxSize;
-        //gameObject.transform.rotation = _physicsBoxRotation;
-        /////////////////////////////////////////////////////
-
         if (colliders.Length > 0)
         {
             index = index == 0 ? 1 : 0;
@@ -118,16 +110,6 @@ public class PlatformsPlacer
 
         platform.transform.position = newPosition;
 
-        PlaceCapsuleOnPlatform(platform);
-    }
-
-    private void PlaceCapsuleOnPlatform(ReusablePlatform platform)
-    {
-        CapsulePlacer capsulePlacer = null;
-
-        if(capsulePlacer != null)
-        {
-            capsulePlacer.SetCapsuleOnPlatform(platform);
-        }
+        PlatformPlaced?.Invoke(platform);
     }
 }
