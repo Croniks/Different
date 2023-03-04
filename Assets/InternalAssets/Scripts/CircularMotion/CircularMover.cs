@@ -8,61 +8,59 @@ public class CircularMover : MonoBehaviour
     [SerializeField] private float _linearMoveSpeed = 5f;
     [SerializeField] private bool _moveClockwise = false;
 
-    private float _directionToOffsetModule = 0f;
+    private float _directionToNewPostionModule = 0f;
     private Vector3 _aroundPointPosition = Vector3.zero;
     
     private void Start()
     {
         _aroundPointPosition = _pointAroundWhichToMove.position;
+        _aroundPointPosition.y = transform.position.y;
 
-        Vector3 directionFromCenter = GetNormalDirectionFromCenter(transform.position, _pointAroundWhichToMove.position, _radius);
-        transform.position = _pointAroundWhichToMove.position + directionFromCenter * _radius;
+         Vector3 directionFromCenterToPostion = (transform.position - _aroundPointPosition).normalized;
+        transform.position = _aroundPointPosition + directionFromCenterToPostion * _radius;
 
-        Vector3 normalMoveDirection = GetNormalLinearMoveDirection(directionFromCenter);
-        normalMoveDirection *= _linearMoveSpeed * Time.fixedDeltaTime;
-        normalMoveDirection += transform.position;
+        directionFromCenterToPostion = GetNormalizeDirectionFromCenter(transform.position, _aroundPointPosition, _radius);
+        Vector3 normalizeMoveDirection = GetNormalizeLinearMoveDirection(directionFromCenterToPostion);
 
-        Vector3 newDirectionFromCenter = normalMoveDirection - _pointAroundWhichToMove.position;
-        _directionToOffsetModule = newDirectionFromCenter.magnitude;
+        normalizeMoveDirection *= _linearMoveSpeed * Time.fixedDeltaTime;
+        normalizeMoveDirection += transform.position;
 
-        Debug.Log($"_directionToOffset: {newDirectionFromCenter}");
-        Debug.Log($"_directionToOffsetModule: {_directionToOffsetModule}");
+        Vector3 directionFromCenterToNewPostion = normalizeMoveDirection - _aroundPointPosition;
+        _directionToNewPostionModule = directionFromCenterToNewPostion.magnitude;
     }
 
     private void FixedUpdate()
     {
-        Vector3 normalDirectionFromCenter = GetNormalDirectionFromCenter(transform.position, _pointAroundWhichToMove.position, _radius);
-        Vector3 normalMoveDirection = GetNormalLinearMoveDirection(normalDirectionFromCenter, _moveClockwise);
-        
-        normalMoveDirection *= _linearMoveSpeed * Time.fixedDeltaTime;
-        normalMoveDirection += transform.position;
+        _aroundPointPosition.y = transform.position.y;
 
-        Vector3 newDirectionFromCenter = normalMoveDirection - _pointAroundWhichToMove.position;
-        Debug.Log($"newDirectionFromCenter: {newDirectionFromCenter}");
-        Debug.Log($"newDirectionFromCenter.magnitue: {newDirectionFromCenter.magnitude}");
+        Vector3 normalizeDirectionFromCenter = GetNormalizeDirectionFromCenter(transform.position, _aroundPointPosition, _radius);
+        Vector3 normalizeMoveDirection = GetNormalizeLinearMoveDirection(normalizeDirectionFromCenter, _moveClockwise);
 
-        newDirectionFromCenter.Normalize();
-        //newDirectionFromCenter = new Vector3(
-        //    newDirectionFromCenter.x / _directionToOffsetModule,
-        //    newDirectionFromCenter.y / _directionToOffsetModule,
-        //    newDirectionFromCenter.z / _directionToOffsetModule
+        normalizeMoveDirection *= _linearMoveSpeed * Time.fixedDeltaTime;
+        normalizeMoveDirection += transform.position;
+
+        Vector3 directionFromCenterToNewPostion = normalizeMoveDirection - _aroundPointPosition;
+
+        //directionFromCenterToNewPostion = new Vector3(
+        //    directionFromCenterToNewPostion.x / _directionToNewPostionModule,
+        //    directionFromCenterToNewPostion.y / _directionToNewPostionModule,
+        //    directionFromCenterToNewPostion.z / _directionToNewPostionModule
         //);
+        directionFromCenterToNewPostion.Normalize();
 
-        //Debug.Log($"newDirectionFromCenter: {newDirectionFromCenter}");
+        directionFromCenterToNewPostion *= _radius;
 
-        newDirectionFromCenter *= _radius;
-
-        Vector3 newPosition = _pointAroundWhichToMove.position + newDirectionFromCenter;
-        transform.position = newPosition;
+        Vector3 newPositionOnCircle = _aroundPointPosition + directionFromCenterToNewPostion;
+        transform.position = newPositionOnCircle;
     }
-
-    private Vector3 GetNormalDirectionFromCenter(Vector3 position, Vector3 pointAroundWhichRotation, float radius)
+    
+    private Vector3 GetNormalizeDirectionFromCenter(Vector3 position, Vector3 pointAroundWhichRotation, float radius)
     {
         Vector3 directionFromCenter = position - pointAroundWhichRotation;
         return new Vector3(directionFromCenter.x / radius, directionFromCenter.y / radius, directionFromCenter.z / radius);
     }
 
-    private Vector3 GetNormalLinearMoveDirection(Vector3 normalDirectionFromCenter, bool clockWise = true)
+    private Vector3 GetNormalizeLinearMoveDirection(Vector3 normalDirectionFromCenter, bool clockWise = true)
     {
         Vector3 normalLinearMoveDirection = new Vector3(normalDirectionFromCenter.z, normalDirectionFromCenter.y, normalDirectionFromCenter.x);
 
